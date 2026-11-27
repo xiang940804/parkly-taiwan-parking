@@ -2,13 +2,39 @@ node_modules/
 dist/
 .vite/
 *.log
+
+# Local environment and credentials
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+*service-account*.json
+secrets*.json
+application_default_credentials.json
+.gcloud/
+
+# Python and local tooling
 __pycache__/
 *.py[cod]
+.venv/
+venv/
 .chrome-qa*/
 .edge-qa*/
 qa-*.png
+
+# Firebase local state
 .firebase/
 .firebaserc.local
+firebase-debug.log*
+ui-debug.log*
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -43,7 +43,7 @@ python --version
 
 ## 安裝步驟
 
-1. 具有私人 repository 權限的協作者可使用：
+1. 複製 repository：
 
    ```powershell
    git clone https://github.com/xiang940804/parkly-taiwan-parking.git
@@ -58,14 +58,13 @@ python --version
 
 Python API 目前只使用 Python 標準函式庫，因此不需要另外執行 `pip install`。
 
-此 repository 設為 **Private**。未受邀的 GitHub 使用者無法檢視或複製原始碼。
+`.env.example` 只包含變數名稱與範例值；真正的 `.env` 已由 `.gitignore` 排除，不會上傳到 GitHub。
 
 ## 開啟伺服器
 
 一般前端開發不需要設定 TDX 金鑰，也不需要另外啟動 Python API。Vite 預設將 `/api` 代理到已部署的 Parkly API：
 
 ```powershell
-cd "C:\Users\Xiang\Desktop\網頁程式設計課程"
 npm run dev
 ```
 
@@ -111,9 +110,11 @@ Python API 會自動讀取專案根目錄的 `.env`；Vite 也會使用同一份
 
 ## TDX 金鑰說明
 
-- 正式網站已由 Google Secret Manager 管理現有 TDX 金鑰，使用網站或執行前端不需要重新設定。
+- 請先至 [TDX 運輸資料流通服務](https://tdx.transportdata.tw/) 申請自己的 Client ID 與 Client Secret。
+- 本機 Python API 只從 `.env` 或作業系統環境變數讀取 TDX 金鑰，程式碼中沒有預設金鑰。
+- 正式網站由 Google Secret Manager 管理部署用 TDX 金鑰，使用正式網站不需要設定本機金鑰。
 - 金鑰由 Python API 讀取，不會傳送至瀏覽器前端。
-- GitHub repository 不保存 Client Secret；私人 repository 也不應提交長效金鑰。
+- GitHub repository 不保存 Client Secret；無論公開或私人 repository 都不應提交長效金鑰。
 - 請勿將 Client Secret 放進前端 JavaScript，否則開啟網站的人可以查看。
 
 本機建議使用 `.env`，也可以臨時使用 PowerShell 工作階段環境變數：
@@ -128,7 +129,18 @@ npm run api
 
 環境變數優先於 `.env`。因此正式 Cloud Run 仍維持原本做法：從 Google Secret Manager 注入 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET`，不會被 `.env` 覆蓋；Docker 映像也不包含 `.env`。
 
-一般協作者只需執行 `npm run dev`，Vite 會使用正式 Parkly API，因此不需要取得或設定 TDX 金鑰。只有要修改及測試 Python API 的後端開發者才需要由專案管理者授予適當的 Secret 存取方式。
+只執行前端時可直接使用預設正式 Parkly API；要完整執行本機前後端時，請在自己的 `.env` 填入 TDX 申請資料。
+
+## 公開 Repository 安全注意事項
+
+下列檔案與內容不得提交：
+
+- `.env`、`.env.local` 等真實環境檔案
+- TDX Client Secret、GitHub Token、Google Cloud 服務帳戶金鑰
+- `*.pem`、`*.key`、`*.p12`、`*.pfx` 私鑰或憑證封裝
+- Google Application Default Credentials 與其他 `credentials*.json`
+
+專案的 `.gitignore` 已排除上述常見檔案，但提交前仍建議執行 `git diff --cached` 確認內容。若金鑰曾經提交，即使後來刪除檔案也必須立即撤銷並重新產生金鑰。
 
 ## 服務架構
 
@@ -145,21 +157,20 @@ Vite 預設將 `/api/*` 請求轉送到正式 Parkly API；如需測試本機後
 目前正式環境已部署完成：
 
 - GCP／Firebase 專案：`parkly-tw-20261120`
-- Private GitHub repository：<https://github.com/xiang940804/parkly-taiwan-parking>
+- GitHub repository：<https://github.com/xiang940804/parkly-taiwan-parking>
 - 正式網站：<https://parkly-tw-20261120.web.app>
 - Cloud Run API：<https://parkly-api-ja77rc5c2q-de.a.run.app>
 - 部署區域：`asia-east1`
 - Cloud Run service：`parkly-api`
-- 執行服務帳號：`parkly-api-runtime@parkly-tw-20261120.iam.gserviceaccount.com`
 
 正式架構由 Firebase Hosting 提供 Vite 靜態檔案，並將 `/api/**` rewrite 到 Cloud Run。`TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET` 儲存在 Google Secret Manager；Cloud Run 服務帳號只被授權讀取這兩個指定 Secret。
 
 Python API 在本機監聽 `127.0.0.1:8000`；偵測到 Cloud Run 的 `K_SERVICE` 後會自動改為 `0.0.0.0:$PORT`。Cloud Run 目前設定最少 instance 為 0、最多 1：閒置時可縮到 0 以降低費用，但第一個請求可能有冷啟動等待時間。
 
-重新部署 API：
+專案擁有者重新部署 API 時，請以自己的 Google Cloud 資源名稱替換尖括號內容：
 
 ```powershell
-gcloud run deploy parkly-api --source api --project parkly-tw-20261120 --region asia-east1 --allow-unauthenticated --service-account parkly-api-runtime@parkly-tw-20261120.iam.gserviceaccount.com --set-secrets TDX_CLIENT_ID=parkly-tdx-client-id:latest,TDX_CLIENT_SECRET=parkly-tdx-client-secret:latest --memory 512Mi --cpu 1 --concurrency 40 --timeout 60 --min 0 --max 1
+gcloud run deploy <SERVICE_NAME> --source api --project <PROJECT_ID> --region <REGION> --allow-unauthenticated --service-account <RUNTIME_SERVICE_ACCOUNT> --set-secrets TDX_CLIENT_ID=<TDX_CLIENT_ID_SECRET>:latest,TDX_CLIENT_SECRET=<TDX_CLIENT_SECRET_SECRET>:latest --memory 512Mi --cpu 1 --concurrency 40 --timeout 60 --min 0 --max 1
 ```
 
 重新部署前端：
@@ -229,11 +240,9 @@ GET http://127.0.0.1:8000/api/parking?lat=22.6273&lon=120.3014&radius=3&type=all
 - 另有涵蓋整個 Parkly 專案的每月 NT$30 警示預算，會在 50%、80% 與 100% 寄送通知。
 - Spend cap 只涵蓋 Cloud Run，Google 官方亦說明執行判定並非瞬時完成；Firebase Hosting、建置儲存及其他服務不包含在此上限內。
 
-重新產生快取時，金鑰只需放在目前終端機的環境變數：
+重新產生快取前，確認專案根目錄的 `.env` 已填入 TDX 變數：
 
 ```powershell
-$env:TDX_CLIENT_ID='你的 Client ID'
-$env:TDX_CLIENT_SECRET='你的 Client Secret'
 npm run cache:parking
 npm run build
 ```
@@ -247,7 +256,6 @@ npm run build
 ├─ scripts/build_parking_cache.py  全台快取產生程式
 ├─ src/                         前端 JavaScript 與 SCSS
 ├─ index.html                   首頁
-├─ parking.html                 停車資訊查詢頁
 ├─ package.json                 npm 指令與套件設定
 ├─ vite.config.js               Vite 與 API 代理設定
 ├─ Parkly-專題簡報內容.md       簡報文字素材
@@ -262,11 +270,11 @@ npm run build
 
 ### 網頁可開啟，但沒有真正的停車資料
 
-確認第一個終端機仍在執行 `npm run api`，並檢查 <http://127.0.0.1:8000/api/health>。若出現 TDX 驗證失敗，請重新啟動 API 並正確輸入現有金鑰。
+確認第一個終端機仍在執行 `npm run api`，並檢查 <http://127.0.0.1:8000/api/health>。若出現 TDX 驗證失敗，請確認 `.env` 的 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET` 已正確填寫，再重新啟動 API。
 
-### 輸入 TDX Secret 時沒有任何字出現
+### 顯示缺少 TDX_CLIENT_ID 或 TDX_CLIENT_SECRET
 
-這是隱藏輸入效果。直接完整輸入後按 Enter 即可。
+請執行 `Copy-Item .env.example .env`，在 `.env` 填入自己的 TDX 申請資料，再重新執行 `npm run api`。
 
 ### 地圖空白或圖磚沒有載入
 

@@ -6,7 +6,6 @@ They are never returned to the browser or written to disk.
 
 from __future__ import annotations
 
-import getpass
 import json
 import math
 import os
@@ -611,12 +610,11 @@ class ParklyHandler(BaseHTTPRequestHandler):
 def read_credentials():
     client_id = os.getenv("TDX_CLIENT_ID", "").strip()
     client_secret = os.getenv("TDX_CLIENT_SECRET", "").strip()
-    if not client_id:
-        client_id = getpass.getpass("TDX Client ID（隱藏輸入）: ").strip()
-    if not client_secret:
-        client_secret = getpass.getpass("TDX Client Secret（隱藏輸入）: ").strip()
     if not client_id or not client_secret:
-        raise SystemExit("TDX Client ID 與 Client Secret 皆為必填")
+        raise SystemExit(
+            "缺少 TDX_CLIENT_ID 或 TDX_CLIENT_SECRET。"
+            "請將專案根目錄的 .env.example 複製為 .env，填入自己的 TDX 變數後重新啟動。"
+        )
     return client_id, client_secret
 
 
