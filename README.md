@@ -131,17 +131,6 @@ npm run api
 
 只執行前端時可直接使用預設正式 Parkly API；要完整執行本機前後端時，請在自己的 `.env` 填入 TDX 申請資料。
 
-## 公開 Repository 安全注意事項
-
-下列檔案與內容不得提交：
-
-- `.env`、`.env.local` 等真實環境檔案
-- TDX Client Secret、GitHub Token、Google Cloud 服務帳戶金鑰
-- `*.pem`、`*.key`、`*.p12`、`*.pfx` 私鑰或憑證封裝
-- Google Application Default Credentials 與其他 `credentials*.json`
-
-專案的 `.gitignore` 已排除上述常見檔案，但提交前仍建議執行 `git diff --cached` 確認內容。若金鑰曾經提交，即使後來刪除檔案也必須立即撤銷並重新產生金鑰。
-
 ## 服務架構
 
 | 服務 | 位址 | 用途 |
@@ -151,33 +140,6 @@ npm run api
 | 本機 Python API（選用） | `http://127.0.0.1:8000` | 修改後端程式時使用 |
 
 Vite 預設將 `/api/*` 請求轉送到正式 Parkly API；如需測試本機後端，可用 `PARKLY_API_PROXY` 改成 `http://127.0.0.1:8000`。
-
-## 正式部署
-
-目前正式環境已部署完成：
-
-- GCP／Firebase 專案：`parkly-tw-20261120`
-- GitHub repository：<https://github.com/xiang940804/parkly-taiwan-parking>
-- 正式網站：<https://parkly-tw-20261120.web.app>
-- Cloud Run API：<https://parkly-api-ja77rc5c2q-de.a.run.app>
-- 部署區域：`asia-east1`
-- Cloud Run service：`parkly-api`
-
-正式架構由 Firebase Hosting 提供 Vite 靜態檔案，並將 `/api/**` rewrite 到 Cloud Run。`TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET` 儲存在 Google Secret Manager；Cloud Run 服務帳號只被授權讀取這兩個指定 Secret。
-
-Python API 在本機監聽 `127.0.0.1:8000`；偵測到 Cloud Run 的 `K_SERVICE` 後會自動改為 `0.0.0.0:$PORT`。Cloud Run 目前設定最少 instance 為 0、最多 1：閒置時可縮到 0 以降低費用，但第一個請求可能有冷啟動等待時間。
-
-專案擁有者重新部署 API 時，請以自己的 Google Cloud 資源名稱替換尖括號內容：
-
-```powershell
-gcloud run deploy <SERVICE_NAME> --source api --project <PROJECT_ID> --region <REGION> --allow-unauthenticated --service-account <RUNTIME_SERVICE_ACCOUNT> --set-secrets TDX_CLIENT_ID=<TDX_CLIENT_ID_SECRET>:latest,TDX_CLIENT_SECRET=<TDX_CLIENT_SECRET_SECRET>:latest --memory 512Mi --cpu 1 --concurrency 40 --timeout 60 --min 0 --max 1
-```
-
-重新部署前端：
-
-```powershell
-npm run deploy:web
-```
 
 ## 地圖標記說明
 
@@ -263,37 +225,4 @@ npm run build
 └─ README.md                    專案說明
 ```
 
-## 常見問題
-
-### 網頁沒有套用 CSS
-
-不要直接開啟 HTML 檔案。請確認已執行 `npm run dev`，並從 <http://127.0.0.1:5173/> 進入。
-
-### 網頁可開啟，但沒有真正的停車資料
-
-確認第一個終端機仍在執行 `npm run api`，並檢查 <http://127.0.0.1:8000/api/health>。若出現 TDX 驗證失敗，請確認 `.env` 的 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET` 已正確填寫，再重新啟動 API。
-
-### 顯示缺少 TDX_CLIENT_ID 或 TDX_CLIENT_SECRET
-
-請執行 `Copy-Item .env.example .env`，在 `.env` 填入自己的 TDX 申請資料，再重新執行 `npm run api`。
-
-### 地圖空白或圖磚沒有載入
-
-請檢查網路連線、瀏覽器開發者工具的錯誤訊息，以及防火牆是否阻擋地圖服務。
-
-### 無法取得目前位置
-
-請允許瀏覽器的位置權限。若拒絕權限，仍可在搜尋欄手動輸入地址或行政區。
-
-### 顯示連接埠已被占用
-
-專案固定使用 5173 與 8000。請先關閉原本使用這兩個連接埠的程序，或回到先前已啟動伺服器的終端機繼續使用。
-
-## 資料來源
-
-- [TDX 運輸資料流通服務](https://tdx.transportdata.tw/)
-- 各地方政府停車開放資料
-- OpenFreeMap / OpenStreetMap 地圖資料
-
-停車剩餘數量與費率以各資料來源最新回傳內容為準，實際狀況仍應依現場公告判斷。
 
