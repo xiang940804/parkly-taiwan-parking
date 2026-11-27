@@ -81,16 +81,33 @@ npm run dev
 
 ### 選用：開發本機 Python API
 
-只有修改 `api/server.py` 時才需要本機 API。先在目前 PowerShell 工作階段設定 TDX 環境變數，再執行：
+只有修改 `api/server.py` 時才需要本機 API。第一次設定時，將範例檔複製為不會提交到 Git 的 `.env`：
 
 ```powershell
-$env:TDX_CLIENT_ID = '<你的 Client ID>'
-$env:TDX_CLIENT_SECRET = '<你的 Client Secret>'
-$env:PARKLY_API_PROXY = 'http://127.0.0.1:8000'
+Copy-Item .env.example .env
+```
+
+開啟 `.env`，填入自己的本機開發值：
+
+```dotenv
+PARKLY_API_PROXY=http://127.0.0.1:8000
+TDX_CLIENT_ID=your_client_id
+TDX_CLIENT_SECRET=your_client_secret
+PARKLY_API_HOST=127.0.0.1
+PARKLY_API_PORT=8000
+```
+
+設定一次後，之後不需要在每個 PowerShell 工作階段重新輸入。使用兩個 PowerShell 視窗分別執行：
+
+```powershell
 npm run api
 ```
 
-另一個 PowerShell 視窗以相同的 `PARKLY_API_PROXY` 設定執行 `npm run dev`。
+```powershell
+npm run dev
+```
+
+Python API 會自動讀取專案根目錄的 `.env`；Vite 也會使用同一份檔案中的 `PARKLY_API_PROXY`。
 
 ## TDX 金鑰說明
 
@@ -99,7 +116,7 @@ npm run api
 - GitHub repository 不保存 Client Secret；私人 repository 也不應提交長效金鑰。
 - 請勿將 Client Secret 放進前端 JavaScript，否則開啟網站的人可以查看。
 
-若不想每次手動輸入，也可以只在目前 PowerShell 工作階段設定環境變數：
+本機建議使用 `.env`，也可以臨時使用 PowerShell 工作階段環境變數：
 
 ```powershell
 $env:TDX_CLIENT_ID = "<目前的 Client ID>"
@@ -108,6 +125,8 @@ npm run api
 ```
 
 關閉該 PowerShell 視窗後，這兩個工作階段變數就不會繼續保留。請不要將實際 Secret 提交到 Git。
+
+環境變數優先於 `.env`。因此正式 Cloud Run 仍維持原本做法：從 Google Secret Manager 注入 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET`，不會被 `.env` 覆蓋；Docker 映像也不包含 `.env`。
 
 一般協作者只需執行 `npm run dev`，Vite 會使用正式 Parkly API，因此不需要取得或設定 TDX 金鑰。只有要修改及測試 Python API 的後端開發者才需要由專案管理者授予適當的 Secret 存取方式。
 
