@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-11-20T15:29:42.639393+00:00",
+  "cities": {
+    "Taipei": {
+      "name": "臺北市",
+      "count": 9919,
+      "file": "Taipei.json"
+    },
+    "NewTaipei": {
+      "name": "新北市",
+      "count": 9998,
+      "file": "NewTaipei.json"
+    },
+    "Taoyuan": {
+      "name": "桃園市",
+      "count": 1137,
+      "file": "Taoyuan.json"
+    },
+    "Taichung": {
+      "name": "臺中市",
+      "count": 7031,
+      "file": "Taichung.json"
+    },
+    "Tainan": {
+      "name": "臺南市",
+      "count": 10094,
+      "file": "Tainan.json"
+    },
+    "Kaohsiung": {
+      "name": "高雄市",
+      "count": 10684,
+      "file": "Kaohsiung.json"
+    },
+    "Keelung": {
+      "name": "基隆市",
+      "count": 39,
+      "file": "Keelung.json"
+    },
+    "Hsinchu": {
+      "name": "新竹市",
+      "count": 24,
+      "file": "Hsinchu.json"
+    },
+    "HsinchuCounty": {
+      "name": "新竹縣",
+      "count": 195,
+      "file": "HsinchuCounty.json"
+    },
+    "MiaoliCounty": {
+      "name": "苗栗縣",
+      "count": 104,
+      "file": "MiaoliCounty.json"
+    },
+    "ChanghuaCounty": {
+      "name": "彰化縣",
+      "count": 283,
+      "file": "ChanghuaCounty.json"
+    },
+    "NantouCounty": {
+      "name": "南投縣",
+      "count": 80,
+      "file": "NantouCounty.json"
+    },
+    "YunlinCounty": {
+      "name": "雲林縣",
+      "count": 4,
+      "file": "YunlinCounty.json"
+    },
+    "Chiayi": {
+      "name": "嘉義市",
+      "count": 30,
+      "file": "Chiayi.json"
+    },
+    "ChiayiCounty": {
+      "name": "嘉義縣",
+      "count": 51,
+      "file": "ChiayiCounty.json"
+    },
+    "PingtungCounty": {
+      "name": "屏東縣",
+      "count": 1878,
+      "file": "PingtungCounty.json"
+    },
+    "YilanCounty": {
+      "name": "宜蘭縣",
+      "count": 79,
+      "file": "YilanCounty.json"
+    },
+    "HualienCounty": {
+      "name": "花蓮縣",
+      "count": 94,
+      "file": "HualienCounty.json"
+    },
+    "TaitungCounty": {
+      "name": "臺東縣",
+      "count": 4,
+      "file": "TaitungCounty.json"
+    },
+    "PenghuCounty": {
+      "name": "澎湖縣",
+      "count": 65,
+      "file": "PenghuCounty.json"
+    },
+    "KinmenCounty": {
+      "name": "金門縣",
+      "count": 5,
+      "file": "KinmenCounty.json"
+    },
+    "LienchiangCounty": {
+      "name": "連江縣",
+      "count": 2,
+      "file": "LienchiangCounty.json"
+    }
+  }
+}

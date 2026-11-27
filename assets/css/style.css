@@ -1,0 +1,4 @@
+/* SCSS is compiled at runtime for this no-build classroom demo. */
+html { background: #f9fcfb; }
+body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: #173d45; }
+[hidden] { display: none !important; }

@@ -1,0 +1,26 @@
+{
+  "name": "parkly-taiwan-parking",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "api": "python api/server.py",
+    "cache:parking": "python scripts/build_parking_cache.py",
+    "build": "vite build",
+    "preview": "vite preview",
+    "firebase:login": "firebase login",
+    "deploy:web": "npm run build && firebase deploy --only hosting"
+  },
+  "devDependencies": {
+    "firebase-tools": "^15.37.0",
+    "sass": "^1.94.2",
+    "vite": "^7.2.4"
+  },
+  "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
+    "jquery": "^3.7.1",
+    "leaflet": "^1.9.4",
+    "maplibre-gl": "^6.19.0"
+  }
+}

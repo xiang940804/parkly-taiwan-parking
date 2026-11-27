@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b3b45">
+  <meta name="description" content="Parkly 全台停車位查詢，快速尋找附近停車場、路邊停車、剩餘車位、費率與距離。">
+  <title>Parkly｜全台停車位查詢</title>
+  <style>
+    .app-shell-loader{position:fixed;z-index:99999;inset:0;display:grid;grid-template-rows:76px 1fr;background:#f7fbfa;transition:opacity .25s ease,visibility .25s ease}.app-shell-loader__nav{display:flex;align-items:center;justify-content:space-between;padding:0 max(20px,calc((100% - 1180px)/2));border-bottom:1px solid #dbe8e5;background:#fff}.app-shell-loader__brand{width:118px;height:36px;border-radius:10px}.app-shell-loader__links{width:220px;height:18px;border-radius:9px}.app-shell-loader__content{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:70px 0;display:grid;grid-template-columns:1fr 1fr;gap:70px}.app-shell-loader__copy,.app-shell-loader__visual{min-width:0}.app-shell-loader__line{height:18px;margin-bottom:18px;border-radius:9px}.app-shell-loader__line--eyebrow{width:180px;height:32px}.app-shell-loader__line--title{width:88%;height:64px}.app-shell-loader__line--title2{width:68%;height:64px}.app-shell-loader__line--body{width:92%}.app-shell-loader__visual{height:420px;border-radius:64px 26px;background:#e2efec}.app-shell-loader__brand,.app-shell-loader__links,.app-shell-loader__line,.app-shell-loader__visual{overflow:hidden;position:relative;background-color:#e6efed}.app-shell-loader__brand::after,.app-shell-loader__links::after,.app-shell-loader__line::after,.app-shell-loader__visual::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.82),transparent);animation:appShellShimmer 1.15s infinite}@keyframes appShellShimmer{to{transform:translateX(100%)}}html.app-ready .app-shell-loader{opacity:0;visibility:hidden;pointer-events:none}@media(max-width:760px){.app-shell-loader{grid-template-rows:66px 1fr}.app-shell-loader__links{width:42px;height:42px}.app-shell-loader__content{width:calc(100% - 28px);grid-template-columns:1fr;padding:48px 0}.app-shell-loader__visual{display:none}.app-shell-loader__line--title,.app-shell-loader__line--title2{height:48px}}
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { ink: '#0b3b45', mint: '#31c6a2', mist: '#eef7f5', sun: '#f7c65d' },
+          fontFamily: { sans: ['Noto Sans TC', 'sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <div class="app-shell-loader" id="app-shell-loader" role="status" aria-label="Parkly 載入中">
+    <div class="app-shell-loader__nav"><span class="app-shell-loader__brand"></span><span class="app-shell-loader__links"></span></div>
+    <div class="app-shell-loader__content">
+      <div class="app-shell-loader__copy"><div class="app-shell-loader__line app-shell-loader__line--eyebrow"></div><div class="app-shell-loader__line app-shell-loader__line--title"></div><div class="app-shell-loader__line app-shell-loader__line--title2"></div><div class="app-shell-loader__line app-shell-loader__line--body"></div><div class="app-shell-loader__line app-shell-loader__line--body"></div></div>
+      <div class="app-shell-loader__visual"></div>
+    </div>
+  </div>
+  <a class="skip-link" href="#main-content">跳到主要內容</a>
+  <header class="site-header" id="top">
+    <div class="shell nav-wrap">
+      <a class="brand" href="#home" data-page-link="home" aria-label="Parkly 首頁">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44" role="img"><path d="M10 7h14.5C32 7 37 11.6 37 18.4 37 25.8 31.6 30 24.3 30H19v7H10V7Zm9 8v7h5c2.5 0 4-1.3 4-3.5S26.5 15 24 15h-5Z" fill="currentColor"/></svg>
+        </span>
+        <span>Parkly</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="主要選單">
+        <a class="nav-link is-active" href="#home" data-page-link="home">首頁</a>
+        <a class="nav-link" href="#search" data-page-link="search">查詢停車資訊</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="status-pill" id="data-status" type="button" title="目前使用展示資料">
+          <span class="status-dot"></span><span>資料服務正常</span>
+        </button>
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="行動版選單" hidden>
+      <a href="#home" data-page-link="home">首頁</a>
+      <a href="#search" data-page-link="search">查詢停車資訊</a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="page is-active" id="home-page" data-page="home" aria-labelledby="hero-title">
+      <div class="hero">
+        <div class="shell hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow"><span></span>全台停車資料，一站掌握</div>
+            <h1 id="hero-title">停車不繞路，<br><span>空位先知道。</span></h1>
+            <p>整合政府開放資料，快速找到附近停車場與路邊停車位。剩餘車位、費率、距離，一眼就看懂。</p>
+            <div class="hero-actions">
+              <a class="primary-btn" href="#search" data-page-link="search">
+                開始找車位
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <button class="text-btn" id="hero-locate" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                使用目前位置
+              </button>
+            </div>
+            <div class="trust-row" aria-label="服務特色">
+              <div><strong>22</strong><span>縣市涵蓋</span></div>
+              <div><strong>即時</strong><span>車位更新</span></div>
+              <div><strong>免費</strong><span>快速查詢</span></div>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="停車地圖示意圖">
+            <div class="map-art" aria-hidden="true">
+              <div class="road road-a"></div><div class="road road-b"></div><div class="road road-c"></div>
+              <div class="block block-a"></div><div class="block block-b"></div><div class="block block-c"></div><div class="block block-d"></div>
+              <span class="mini-pin pin-a">P</span><span class="mini-pin pin-b">P</span><span class="mini-pin pin-c">P</span>
+            </div>
+            <div class="float-card spot-card">
+              <div class="spot-icon">P</div>
+              <div><strong>中央公園停車場</strong><span><b>42</b> 個空位 · 650m</span></div>
+            </div>
+            <div class="float-card live-card"><span class="pulse"></span><strong>即時更新</strong><small>剛剛</small></div>
+            <div class="location-orb" aria-hidden="true"><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <section class="benefits section-pad" aria-labelledby="benefit-title">
+        <div class="shell">
+          <div class="section-heading">
+            <div><span class="kicker">為什麼選擇 Parkly</span><h2 id="benefit-title">把找車位的時間，留給更重要的事</h2></div>
+            <p>從出發前規劃到抵達目的地，用清楚可靠的資訊，讓每一次停車都更簡單。</p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card feature-card--large">
+              <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 21s7-5 7-12a7 7 0 1 0-14 0c0 7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+              <h3>附近車位，快速定位</h3><p>自動取得目前位置，也能手動輸入地址。地圖會縮放到對應範圍，立即顯示周邊選擇。</p>
+              <div class="feature-search-demo" id="feature-search-demo" data-scene="taipei" aria-label="地址搜尋與地圖結果動畫示範">
+                <div class="feature-demo-search">
+                  <span class="feature-demo-query" id="feature-demo-query"></span><i class="feature-demo-caret" aria-hidden="true"></i><b>搜尋</b>
+                </div>
+                <div class="feature-demo-map" aria-hidden="true">
+                  <div class="feature-demo-map-canvas" id="feature-demo-map-canvas"></div>
+                  <span class="demo-map-district" id="feature-demo-district">台北車站周邊</span>
+                  <span class="demo-road demo-road-a"></span><span class="demo-road demo-road-b"></span><span class="demo-road demo-road-c"></span><span class="demo-road demo-road-d"></span>
+                  <span class="demo-road-label demo-road-label-a" id="feature-demo-road-a">忠孝西路</span><span class="demo-road-label demo-road-label-b" id="feature-demo-road-b">館前路</span><span class="demo-road-label demo-road-label-c" id="feature-demo-road-c">市民大道</span>
+                  <i class="demo-map-pin demo-map-pin-a">P</i><i class="demo-map-pin demo-map-pin-b">P</i><i class="demo-map-pin demo-map-pin-c">P</i><i class="demo-map-user"></i>
+                  <div class="feature-demo-result"><span>P</span><div><strong id="feature-demo-result-name">台北車站地下停車場</strong><small><b id="feature-demo-result-spaces">28</b> 個空位 · <em id="feature-demo-result-distance">180m</em></small></div></div>
+                </div>
+              </div>
+            </article>
+            <article class="feature-card">
+              <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9m8 10V4m8 15v-6"/><path d="M2 19h20"/></svg></div>
+              <h3>即時剩餘車位</h3><p>同步動態車位，避開已滿停車場。</p>
+              <div class="availability-demo"><div><span>剩餘</span><b>28</b></div><i><em style="width:72%"></em></i></div>
+            </article>
+            <article class="feature-card">
+              <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 6.5c0-2-2-3-5-3s-5 1.4-5 3.5 1.6 3 5 3 5 1.2 5 3.5-2 4-5 4-5-1.5-5-3.5"/></svg></div>
+              <h3>費率透明好比較</h3><p>計時、當日上限與免費時段清楚呈現。</p>
+              <div class="price-demo"><b>$30</b><span>/ 小時</span><small>當日上限 $180</small></div>
+            </article>
+            <article class="feature-card feature-card--wide">
+              <div>
+                <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M4 20V10l8-6 8 6v10H4Z"/><path d="M9 20v-6h6v6"/></svg></div>
+                <h3>路外、路邊一次查</h3><p>停車場與路邊停車路段整合顯示，依距離、空位與費率快速篩選。</p>
+              </div>
+              <div class="type-demo"><span class="active">停車場</span><span>路邊停車</span><span>充電車位</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="how-section section-pad" aria-labelledby="how-title">
+        <div class="shell">
+          <div class="section-heading compact"><div><span class="kicker">三個步驟</span><h2 id="how-title">簡單找，輕鬆停</h2></div></div>
+          <ol class="steps-grid">
+            <li><span class="step-number">01</span><div><h3>定位或輸入地點</h3><p>允許瀏覽器定位，或搜尋目的地地址。</p></div></li>
+            <li><span class="step-number">02</span><div><h3>比較附近車位</h3><p>查看距離、空位、費率與營業狀態。</p></div></li>
+            <li><span class="step-number">03</span><div><h3>開啟導航出發</h3><p>選定停車位置後，以地圖導航前往。</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+    </section>
+
+    <section class="page search-page" id="search-page" data-page="search" aria-labelledby="search-title" hidden>
+      <div class="search-toolbar">
+        <div class="shell">
+          <div class="search-title-row">
+            <div><span class="kicker">全台停車資訊</span><h1 id="search-title">找附近停車位</h1></div>
+            <p id="search-summary">目前位置附近，共找到 <strong>6</strong> 個停車選擇</p>
+          </div>
+          <form class="location-form" id="location-form" role="search">
+            <div class="search-combobox">
+              <label class="search-box" for="location-input">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="location-input" name="location" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="location-suggestions" aria-expanded="false" placeholder="輸入地址、地標或行政區，例如：高雄車站">
+                <button class="clear-search" id="clear-search" type="button" aria-label="清除搜尋" hidden>×</button>
+              </label>
+              <div class="search-suggestions" id="location-suggestions" role="listbox" aria-label="地點與停車場建議" hidden></div>
+            </div>
+            <button class="search-submit" type="submit">搜尋</button>
+            <button class="locate-btn" id="locate-btn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+              <span>取得目前位置</span>
+            </button>
+          </form>
+          <div class="filter-row" aria-label="停車資訊篩選">
+            <div class="filter-group" role="group" aria-label="停車類型">
+              <button class="filter-chip is-active" data-filter="type" data-value="all" type="button">全部</button>
+              <button class="filter-chip" data-filter="type" data-value="offstreet" type="button">停車場</button>
+              <button class="filter-chip" data-filter="type" data-value="curb" type="button">路邊停車</button>
+            </div>
+            <div class="filter-divider"></div>
+            <div class="select-wrap"><label class="sr-only" for="radius-select">查詢半徑</label><select id="radius-select"><option value="1">1 公里內</option><option value="3" selected>3 公里內</option><option value="5">5 公里內</option><option value="10">10 公里內</option></select></div>
+            <label class="toggle-label"><input id="available-only" type="checkbox"><span class="toggle"></span>只看有空位</label>
+            <div class="select-wrap sort-select"><label class="sr-only" for="sort-select">排序方式</label><select id="sort-select"><option value="distance">距離最近</option><option value="available">空位最多</option><option value="price">費率最低</option></select></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-content">
+        <div class="mobile-map-toggle" role="group" aria-label="行動版檢視方式">
+          <button class="is-active" data-mobile-view="list" type="button">清單</button><button data-mobile-view="map" type="button">地圖</button>
+        </div>
+        <div class="results-panel" id="results-panel">
+          <div class="results-head"><h2>搜尋結果</h2><span id="result-count">6 筆</span></div>
+          <div class="parking-list" id="parking-list" aria-live="polite"></div>
+          <div class="empty-state" id="empty-state" hidden>
+            <div>P</div><h3>這個範圍內暫時沒有結果</h3><p>試著增加查詢半徑，或取消「只看有空位」。</p>
+          </div>
+        </div>
+        <div class="map-panel" id="map-panel">
+          <div id="map" aria-label="停車位置地圖"></div>
+          <div class="map-fetch-status" id="map-fetch-status" role="status" aria-live="polite" hidden>
+            <span class="map-fetch-spinner" aria-hidden="true"></span><span id="map-fetch-text">正在更新此區域…</span>
+          </div>
+          <button class="map-recenter" id="map-recenter" type="button" title="回到目前搜尋位置" aria-label="回到目前搜尋位置">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+          </button>
+          <div class="map-legend">
+            <span><i class="legend-curb is-available"></i>路邊可停</span>
+            <span><i class="legend-curb is-occupied"></i>路邊已占用</span>
+            <span><i class="legend-curb is-unknown"></i>狀態未知</span>
+            <span><i class="legend-parking">P</i>停車場</span>
+            <span><i class="legend-cluster">12</i>區域數量</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div><a class="brand brand--footer" href="#home" data-page-link="home"><span class="brand-mark">P</span><span>Parkly</span></a><p>讓每一次停車，都少一點繞路。</p></div>
+      <div><strong>快速連結</strong><a href="#home" data-page-link="home">首頁</a><a href="#search" data-page-link="search">停車查詢</a></div>
+      <div><strong>資料服務</strong><a href="https://tdx.transportdata.tw/" target="_blank" rel="noopener">TDX 運輸資料流通服務</a><span>地圖 © OpenStreetMap contributors</span></div>
+      <div class="footer-note"><span class="status-dot"></span><span>即時資料服務<br><small>整合 TDX 與地方政府開放資料</small></span></div>
+    </div>
+    <div class="shell copyright"><span>© 2026 Parkly. All rights reserved.</span><span>空位與費率以現場公告為準</span></div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-icon">✓</span><p id="toast-message">已更新位置</p></div>
+
+</body>
+</html>
