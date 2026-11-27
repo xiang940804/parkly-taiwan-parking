@@ -196,6 +196,7 @@ npm run deploy:web
 | `npm install` | 安裝前端套件 |
 | `npm run api` | 啟動 Python API（8000） |
 | `npm run cache:parking` | 重新建立全台 22 縣市 Firebase 停車快取 |
+| `npm run cache:sanitize` | 清除快取費率欄位中誤混入的聯絡資訊 |
 | `npm run dev` | 啟動 Vite 開發伺服器（5173） |
 | `npm run build` | 建立正式版檔案到 `dist` |
 | `npm run preview` | 預覽已建置的前端檔案 |

@@ -7,6 +7,7 @@
     "dev": "vite",
     "api": "python api/server.py",
     "cache:parking": "python scripts/build_parking_cache.py",
+    "cache:sanitize": "python scripts/sanitize_parking_cache.py",
     "build": "vite build",
     "preview": "vite preview",
     "firebase:login": "firebase login",

@@ -204,6 +204,26 @@ def localized(value, fallback: str = "") -> str:
     return fallback
 
 
+CONTACT_MARKER_RE = re.compile(r"(?:停車場)?聯絡人|聯絡電話|業務經理|客服電話", re.I)
+PHONE_RE = re.compile(r"(?<!\d)(?:\+?886[-\s]?)?(?:0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{3,4}|09\d{2}[-\s]?\d{3}[-\s]?\d{3})(?!\d)")
+EMAIL_RE = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
+
+
+def sanitize_public_text(value: str, fallback: str = "依現場公告") -> str:
+    """Remove contact details accidentally embedded in public fare text."""
+    text = str(value or "").strip()
+    if not text:
+        return fallback
+    if CONTACT_MARKER_RE.search(text):
+        return fallback
+    sanitized = EMAIL_RE.sub("", text)
+    sanitized = PHONE_RE.sub("", sanitized)
+    if sanitized == text:
+        return text
+    sanitized = re.sub(r"\s{2,}", " ", sanitized).strip(" ，,；;。")
+    return sanitized or fallback
+
+
 def number(value, default=None):
     try:
         result = float(value)
@@ -291,7 +311,7 @@ def normalize_offstreet(static_rows, live_rows, city, lat, lon, radius):
             continue
         carpark_id = str(row.get("CarParkID", ""))
         live = live_by_id.get(carpark_id, {})
-        fare = localized(row.get("FareDescription"), "依現場公告") or "依現場公告"
+        fare = sanitize_public_text(localized(row.get("FareDescription"), "依現場公告"))
         results.append({
             "id": f"offstreet-{carpark_id}",
             "name": localized(row.get("CarParkName"), "未命名停車場"),
@@ -333,7 +353,7 @@ def normalize_curb(static_rows, live_rows, city, lat, lon, radius):
             continue
         segment_id = str(row.get("ParkingSegmentID", ""))
         live = live_by_id.get(segment_id, {})
-        fare = localized(row.get("FareDescription"), "依現場公告") or "依現場公告"
+        fare = sanitize_public_text(localized(row.get("FareDescription"), "依現場公告"))
         results.append({
             "id": f"curb-{segment_id}",
             "name": localized(row.get("ParkingSegmentName"), "路邊停車路段"),
@@ -398,7 +418,7 @@ def normalize_curb_spots(static_rows, live_rows, segment_rows, city, lat, lon, r
         details = segment_by_id.get(segment_id, segment)
         segment_name = localized(details.get("ParkingSegmentName"), "路邊停車格")
         segment_address = road_address(details)
-        segment_fare = localized(details.get("FareDescription"), "依現場公告") or "依現場公告"
+        segment_fare = sanitize_public_text(localized(details.get("FareDescription"), "依現場公告"))
         for spot in _spot_children(segment, "ParkingSpots", "CurbParkingSpots", "Spots"):
             position = (
                 spot.get("ParkingSpotPosition")
@@ -415,7 +435,7 @@ def normalize_curb_spots(static_rows, live_rows, segment_rows, city, lat, lon, r
                 continue
             spot_id = str(spot.get("ParkingSpotID", ""))
             live = live_by_id.get(spot_id, {})
-            fare = localized(spot.get("FareDescription"), segment_fare) or segment_fare
+            fare = sanitize_public_text(localized(spot.get("FareDescription"), segment_fare), segment_fare)
             address = localized(spot.get("Address"), segment_address) or segment_address
             results.append({
                 "id": f"curb-spot-{spot_id or len(results)}",
